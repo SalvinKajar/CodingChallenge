@@ -22,6 +22,7 @@ import com.db.grad.javaapi.exception.ResourceNotFoundException;
 import com.db.grad.javaapi.model.Securities;
 import com.db.grad.javaapi.repository.SecuritiesRepository;
 import java.util.*;  
+import java.text.SimpleDateFormat;  
 
 @RestController
 @CrossOrigin
@@ -37,6 +38,8 @@ public class SecuritiesController {
         return secur;
     }
 
+
+
     @GetMapping("/securities/{id}")
     public ResponseEntity < Securities > getSecuritiesById(@PathVariable(value = "id") Long id)
     throws ResourceNotFoundException {
@@ -44,7 +47,57 @@ public class SecuritiesController {
             .orElseThrow(() -> new ResourceNotFoundException("Security not found for id " + id));
         return ResponseEntity.ok().body(securities);
     }
+    @GetMapping("/securities/{date1}/{date2}")
+    public List < Securities > getSecuritiesById(@PathVariable(value = "date1")String date1,@PathVariable(value = "date2") String date2)
+    throws ResourceNotFoundException,Exception {
+        Date d1=new SimpleDateFormat("dd-MM-yyyy").parse(date1);
+        Date d2=new SimpleDateFormat("dd-MM-yyyy").parse(date2);
+        int c1,c2;
+       List < Securities > secur = securitiesRepository.findAll();
+       List < Securities > result=new ArrayList<Securities>();  
+       for(int i=0;i<secur.size();i++){
+       
+        
+        c1=d1.compareTo(secur.get(i).maturitydate); //<=0
+        c2=d2.compareTo(secur.get(i).maturitydate); //>=0
+        System.out.println("c1 = "+c1);
+        System.out.println("c1 = "+c2);
 
+        System.out.println("d1 = "+d1);
+        System.out.println("d2 = "+d2);
+        if(c1<=0 & c2>=0){
+            System.out.println("working");
+            result.add(secur.get(i));
+            
+
+
+        }
+
+       }
+        return result;
+    }
+     @GetMapping("/maturedsecurities")
+    public List < Securities > getAllMaturedSecurities() {
+        List < Securities > secur = securitiesRepository.findAll();
+        List < Securities > result=new ArrayList<Securities>(); 
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");  
+        Date date = new Date(); 
+
+        System.out.println(date);
+
+        int c1;
+        for(int i=0;i<secur.size();i++){
+       
+        
+        c1=date.compareTo(secur.get(i).maturitydate);
+        if(c1>0){
+            result.add(secur.get(i));
+
+        }
+
+        }  
+        return result;
+    }
     @PostMapping("/securities")
     public Securities createSecurities(@Valid @RequestBody Securities securities) {
         return securitiesRepository.saveAndFlush(securities);
