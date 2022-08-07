@@ -50,8 +50,8 @@ public class SecuritiesController {
     @GetMapping("/securities/{date1}/{date2}")
     public List < Securities > getSecuritiesById(@PathVariable(value = "date1")String date1,@PathVariable(value = "date2") String date2)
     throws ResourceNotFoundException,Exception {
-        Date d1=new SimpleDateFormat("dd-MM-yyyy").parse(date1);
-        Date d2=new SimpleDateFormat("dd-MM-yyyy").parse(date2);
+        Date d1=new SimpleDateFormat("yyyy-MM-dd").parse(date1);
+        Date d2=new SimpleDateFormat("yyyy-MM-dd").parse(date2);
         int c1,c2;
        List < Securities > secur = securitiesRepository.findAll();
        List < Securities > result=new ArrayList<Securities>();  
